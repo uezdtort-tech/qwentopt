@@ -1,10 +1,14 @@
 import React from 'react';
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
-import { Header, Footer, DashboardSidebar } from './components/Layout';
 import { HomePage } from './pages/HomePage';
 import { CatalogPage } from './pages/CatalogPage';
 import { ProductPage } from './pages/ProductPage';
+import { B2BPage } from './pages/B2BPage';
+import { EventPlannerPage } from './pages/EventPlannerPage';
+import { ChatPage } from './pages/ChatPage';
+import { AuthPage } from './pages/AuthPage';
+import { CartPage } from './pages/CartPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { OrdersPage } from './pages/OrdersPage';
 import { ProductsPage } from './pages/ProductsPage';
@@ -12,33 +16,30 @@ import { RecipesPage } from './pages/RecipesPage';
 import { InventoryPage } from './pages/InventoryPage';
 import { CustomersPage } from './pages/CustomersPage';
 import { FinancePage } from './pages/FinancePage';
-import { B2BPage } from './pages/B2BPage';
-import { EventPlannerPage } from './pages/EventPlannerPage';
-import { ChatPage } from './pages/ChatPage';
 import { AIAssistantPage } from './pages/AIAssistantPage';
-import { AuthPage } from './pages/AuthPage';
-import { AuthCallbackPage } from './pages/AuthCallbackPage';
-import { CartPage } from './pages/CartPage';
+import { Header, Footer, DashboardSidebar } from './components/Layout';
 
 function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <>
       <Header />
-      <main className="flex-1">{children}</main>
+      <main style={{ flex: 1 }}>{children}</main>
       <Footer />
-    </div>
+    </>
   );
 }
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <>
       <Header />
-      <div className="flex flex-1">
+      <div style={{ display: 'flex', flex: 1 }}>
         <DashboardSidebar />
-        <main className="flex-1 overflow-auto bg-cream/50">{children}</main>
+        <main style={{ flex: 1, overflow: 'auto', backgroundColor: '#FDF8F3' }}>
+          {children}
+        </main>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -73,7 +74,6 @@ function AppRoutes() {
         <Route path="/events" element={<EventPlannerPage />} />
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/auth" element={<AuthPage />} />
-        <Route path="/auth/callback" element={<AuthCallbackPage />} />
         <Route path="/cart" element={<CartPage />} />
       </Routes>
     </PublicLayout>
@@ -84,7 +84,9 @@ function App() {
   return (
     <AppProvider>
       <HashRouter>
-        <AppRoutes />
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#FDF8F3' }}>
+          <AppRoutes />
+        </div>
       </HashRouter>
     </AppProvider>
   );
