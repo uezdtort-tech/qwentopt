@@ -17,6 +17,7 @@ import { EventPlannerPage } from './pages/EventPlannerPage';
 import { ChatPage } from './pages/ChatPage';
 import { AIAssistantPage } from './pages/AIAssistantPage';
 import { AuthPage } from './pages/AuthPage';
+import { AuthCallbackPage } from './pages/AuthCallbackPage';
 import { CartPage } from './pages/CartPage';
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -60,6 +61,7 @@ function AppRoutes() {
             <Route path="/events" element={<EventPlannerPage />} />
             <Route path="/chat" element={<ChatPage />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/auth/callback" element={<AuthCallbackPage />} />
             <Route path="/cart" element={<CartPage />} />
           </Routes>
         )}
