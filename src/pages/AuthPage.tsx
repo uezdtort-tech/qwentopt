@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { Eye, EyeOff } from 'lucide-react';
+import { SocialAuthButton } from '../components/SocialAuthButton';
+import { getOAuthService, OAuthProvider } from '../services/oauth';
+import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 export function AuthPage() {
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -10,13 +12,33 @@ export function AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [loading, setLoading] = useState<{ yandex: boolean; vk: boolean }>({ yandex: false, vk: false });
+  const [error, setError] = useState<string | null>(null);
   const { login } = useApp();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnUrl = searchParams.get('returnUrl') || '/';
+
+  const oauthService = getOAuthService();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     login(role);
-    navigate(role === 'seller' ? '/dashboard' : '/');
+    navigate(returnUrl);
+  };
+
+  const handleSocialAuth = async (provider: OAuthProvider) => {
+    setError(null);
+    setLoading(prev => ({ ...prev, [provider]: true }));
+
+    try {
+      // Сохраняем returnUrl для возврата после авторизации
+      await oauthService.initiateAuth(provider, returnUrl);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ошибка авторизации');
+      setLoading(prev => ({ ...prev, [provider]: false }));
+    }
   };
 
   return (
@@ -35,6 +57,40 @@ export function AuthPage() {
         </div>
 
         <div className="bg-white rounded-2xl border border-cream-dark p-6 shadow-sm">
+          {/* Social Auth Buttons */}
+          <div className="space-y-3 mb-6">
+            <SocialAuthButton
+              provider="yandex"
+              onClick={() => handleSocialAuth('yandex')}
+              loading={loading.yandex}
+              disabled={loading.vk}
+            />
+            <SocialAuthButton
+              provider="vk"
+              onClick={() => handleSocialAuth('vk')}
+              loading={loading.vk}
+              disabled={loading.yandex}
+            />
+          </div>
+
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-cream-dark"></div>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-3 text-graphite-light">или через email</span>
+            </div>
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-3 bg-berry/10 border border-berry/30 rounded-lg flex items-start gap-2">
+              <AlertCircle className="w-5 h-5 text-berry shrink-0 mt-0.5" />
+              <p className="text-sm text-berry">{error}</p>
+            </div>
+          )}
+
           {/* Role selector */}
           <div className="flex gap-2 mb-6">
             <button onClick={() => setRole('buyer')} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${role === 'buyer' ? 'bg-berry text-white' : 'bg-cream-dark text-graphite-light'}`}>
@@ -93,8 +149,8 @@ export function AuthPage() {
         {/* Demo notice */}
         <div className="mt-6 bg-cream rounded-xl p-4 border border-cream-dark text-center">
           <p className="text-xs text-graphite-light">
-            <strong>Демо-режим:</strong> Нажмите «Войти» для входа с демонстрационными данными. 
-            В production используется Supabase Auth с проверкой на сервере.
+            <strong>Демо-режим:</strong> Социальная авторизация через Яндекс ID и VK ID настроена. 
+            Для работы требуется регистрация приложений в кабинетах провайдеров и настройка переменных окружения.
           </p>
         </div>
       </div>
