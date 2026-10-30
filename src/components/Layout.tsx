@@ -13,18 +13,16 @@ export function Header() {
   const cartCount = cart.reduce((s, c) => s + c.qty, 0);
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-stone-200 shadow-sm">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-stone-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <div className="w-9 h-9 bg-rose-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">C</span>
             </div>
-            <span className="font-display text-xl font-bold text-stone-800 hidden sm:block">Conditera</span>
+            <span className="font-serif text-xl font-bold text-stone-800 hidden sm:block">Conditera</span>
           </Link>
 
-          {/* Navigation */}
           <nav className="hidden md:flex items-center gap-6">
             <Link to="/catalog" className={`text-sm font-medium transition-colors ${location.pathname === '/catalog' ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>Каталог</Link>
             <Link to="/b2b" className={`text-sm font-medium transition-colors ${location.pathname === '/b2b' ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>Партнёрам</Link>
@@ -34,7 +32,6 @@ export function Header() {
             )}
           </nav>
 
-          {/* Actions */}
           <div className="flex items-center gap-3">
             <button onClick={() => navigate('/catalog')} className="p-2 hover:bg-stone-100 rounded-full transition-colors">
               <Search className="w-5 h-5 text-stone-600" />
@@ -58,17 +55,17 @@ export function Header() {
                   <ChevronDown className="w-4 h-4 text-stone-600" />
                 </button>
                 {profileOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-stone-200 py-2 animate-fade-in">
+                  <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-stone-200 py-2">
                     <div className="px-4 py-2 border-b border-stone-200">
                       <p className="text-sm font-medium">{userName}</p>
                       <p className="text-xs text-stone-500 capitalize">{userRole === 'seller' ? 'Кондитер' : userRole === 'buyer' ? 'Покупатель' : 'Администратор'}</p>
                     </div>
                     {(userRole === 'seller' || userRole === 'admin') && (
-                      <button onClick={() => { switchView('dashboard'); navigate('/dashboard'); setProfileOpen(false); }} className="w-full text-left px-4 py-2 text-sm hover:bg-stone-50 transition-colors">Кабинет</button>
+                      <button onClick={() => { switchView('dashboard'); navigate('/dashboard'); setProfileOpen(false); }} className="w-full text-left px-4 py-2 text-sm hover:bg-stone-50">Кабинет</button>
                     )}
-                    <button onClick={() => { switchView('public'); navigate('/'); setProfileOpen(false); }} className="w-full text-left px-4 py-2 text-sm hover:bg-stone-50 transition-colors">Публичная часть</button>
+                    <button onClick={() => { switchView('public'); navigate('/'); setProfileOpen(false); }} className="w-full text-left px-4 py-2 text-sm hover:bg-stone-50">Публичная часть</button>
                     <hr className="my-1 border-stone-200" />
-                    <button onClick={() => { logout(); navigate('/'); setProfileOpen(false); }} className="w-full text-left px-4 py-2 text-sm text-rose-600 hover:bg-stone-50 transition-colors flex items-center gap-2">
+                    <button onClick={() => { logout(); navigate('/'); setProfileOpen(false); }} className="w-full text-left px-4 py-2 text-sm text-rose-600 hover:bg-stone-50 flex items-center gap-2">
                       <LogOut className="w-4 h-4" /> Выйти
                     </button>
                   </div>
@@ -84,9 +81,8 @@ export function Header() {
           </div>
         </div>
 
-        {/* Mobile menu */}
         {menuOpen && (
-          <div className="md:hidden border-t border-stone-200 py-4 animate-fade-in">
+          <div className="md:hidden border-t border-stone-200 py-4">
             <nav className="flex flex-col gap-2">
               <Link to="/catalog" onClick={() => setMenuOpen(false)} className="px-3 py-2 rounded-lg text-sm font-medium hover:bg-stone-100">Каталог</Link>
               <Link to="/b2b" onClick={() => setMenuOpen(false)} className="px-3 py-2 rounded-lg text-sm font-medium hover:bg-stone-100">Партнёрам</Link>
@@ -115,7 +111,7 @@ export function DashboardSidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-white border-r border-stone-200 min-h-full hidden lg:block">
+    <aside className="w-64 bg-white border-r border-stone-200 min-h-[calc(100vh-64px)] hidden lg:block">
       <nav className="p-4 space-y-1">
         {links.map(link => (
           <Link key={link.to} to={link.to} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${location.pathname === link.to ? 'bg-rose-50 text-rose-600' : 'text-stone-600 hover:bg-stone-50'}`}>
@@ -138,7 +134,7 @@ export function Footer() {
               <div className="w-8 h-8 bg-rose-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold">C</span>
               </div>
-              <span className="font-display text-lg font-bold">Conditera</span>
+              <span className="font-serif text-lg font-bold">Conditera</span>
             </div>
             <p className="text-sm text-stone-400 leading-relaxed">Современная экосистема для кондитеров. Создавайте, продавайте, управляйте — всё в одном месте.</p>
           </div>
