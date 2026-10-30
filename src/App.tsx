@@ -4,6 +4,7 @@ import { StoreCtx, loadStore, saveStore } from './store';
 import { Header, Footer, DashboardSidebar } from './components';
 import { HomePage, CatalogPage, ProductPage, ConstructorPage, CartPage, AuthPage, ChatPage, EventsPage, B2BPage } from './pages-public';
 import { DashboardOverview, DashboardOrders, DashboardProducts, DashboardRecipes, DashboardInventory, DashboardFinance, DashboardCustomers, DashboardProduction, DashboardUsers, DashboardFavorites, DashboardProfile, DashboardEvents, DashboardModeration, DashboardAnalytics, DashboardServices, DashboardVenues, DashboardDeliveries, DashboardTickets, DashboardSupport, DashboardSettings, ProjectsPage } from './pages-dashboard';
+import { IntegrationsPage } from './pages-dashboard/IntegrationsPage';
 
 function AppRoutes() {
   const location = useLocation();
@@ -37,6 +38,7 @@ function AppRoutes() {
               <Route path="/dashboard/tickets" element={<DashboardTickets />} />
               <Route path="/dashboard/support" element={<DashboardSupport />} />
               <Route path="/dashboard/settings" element={<DashboardSettings />} />
+              <Route path="/dashboard/integrations" element={<IntegrationsPage />} />
             </Routes>
           </main>
         </div>

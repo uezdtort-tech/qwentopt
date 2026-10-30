@@ -212,6 +212,7 @@ export function DashboardSidebar() {
       { to: '/dashboard/orders', label: 'Все заказы', icon: <Package className="w-4 h-4" /> },
       { to: '/dashboard/moderation', label: 'Модерация', icon: <Shield className="w-4 h-4" /> },
       { to: '/dashboard/analytics', label: 'Аналитика', icon: <BarChart3 className="w-4 h-4" /> },
+      { to: '/dashboard/integrations', label: 'Интеграции', icon: <Settings className="w-4 h-4" /> },
     ],
     superadmin: [
       { to: '/dashboard', label: 'Обзор', icon: <Home className="w-4 h-4" /> },
@@ -220,6 +221,7 @@ export function DashboardSidebar() {
       { to: '/dashboard/moderation', label: 'Модерация', icon: <Shield className="w-4 h-4" /> },
       { to: '/dashboard/analytics', label: 'Аналитика', icon: <BarChart3 className="w-4 h-4" /> },
       { to: '/dashboard/settings', label: 'Настройки', icon: <Settings className="w-4 h-4" /> },
+      { to: '/dashboard/integrations', label: 'Интеграции', icon: <Settings className="w-4 h-4" /> },
     ],
     florist: [
       { to: '/dashboard', label: 'Обзор', icon: <Home className="w-4 h-4" /> },
