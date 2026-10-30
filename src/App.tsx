@@ -3,7 +3,7 @@ import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { StoreCtx, loadStore, saveStore } from './store';
 import { Header, Footer, DashboardSidebar } from './components';
 import { HomePage, CatalogPage, ProductPage, ConstructorPage, CartPage, AuthPage, ChatPage, EventsPage, B2BPage } from './pages-public';
-import { DashboardOverview, DashboardOrders, DashboardProducts, DashboardRecipes, DashboardInventory, DashboardFinance, DashboardCustomers, DashboardProduction, DashboardUsers, DashboardFavorites, DashboardProfile, DashboardEvents, DashboardModeration, DashboardAnalytics, ProjectsPage } from './pages-dashboard';
+import { DashboardOverview, DashboardOrders, DashboardProducts, DashboardRecipes, DashboardInventory, DashboardFinance, DashboardCustomers, DashboardProduction, DashboardUsers, DashboardFavorites, DashboardProfile, DashboardEvents, DashboardModeration, DashboardAnalytics, DashboardServices, DashboardVenues, DashboardDeliveries, DashboardTickets, DashboardSupport, DashboardSettings, ProjectsPage } from './pages-dashboard';
 
 function AppRoutes() {
   const location = useLocation();
@@ -31,6 +31,12 @@ function AppRoutes() {
               <Route path="/dashboard/events" element={<DashboardEvents />} />
               <Route path="/dashboard/moderation" element={<DashboardModeration />} />
               <Route path="/dashboard/analytics" element={<DashboardAnalytics />} />
+              <Route path="/dashboard/services" element={<DashboardServices />} />
+              <Route path="/dashboard/venues" element={<DashboardVenues />} />
+              <Route path="/dashboard/deliveries" element={<DashboardDeliveries />} />
+              <Route path="/dashboard/tickets" element={<DashboardTickets />} />
+              <Route path="/dashboard/support" element={<DashboardSupport />} />
+              <Route path="/dashboard/settings" element={<DashboardSettings />} />
             </Routes>
           </main>
         </div>

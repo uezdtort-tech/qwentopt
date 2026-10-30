@@ -1,4 +1,22 @@
-export type Role = 'client' | 'confectioner' | 'supplier' | 'decorator' | 'animator' | 'organizer' | 'admin';
+export type Role = 
+  | 'client' 
+  | 'confectioner' 
+  | 'supplier' 
+  | 'decorator' 
+  | 'animator' 
+  | 'organizer' 
+  | 'operator'
+  | 'support'
+  | 'moderator'
+  | 'admin'
+  | 'superadmin'
+  | 'florist'
+  | 'photographer'
+  | 'host'
+  | 'caterer'
+  | 'venue'
+  | 'courier'
+  | 'corporate';
 
 export interface User {
   id: string;

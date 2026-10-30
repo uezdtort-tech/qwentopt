@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Search, Menu, X, LogOut, ChevronDown, MessageCircle, Home, Package, FileText, Users, DollarSign, CalendarDays, User, Heart, Shield, BarChart3 } from 'lucide-react';
+import { ShoppingCart, Search, Menu, X, LogOut, ChevronDown, MessageCircle, Home, Package, FileText, Users, DollarSign, CalendarDays, User, Heart, Shield, BarChart3, Settings } from 'lucide-react';
 import { useStore, useCurrentUser } from './store';
 
 export function Header() {
@@ -16,7 +16,11 @@ export function Header() {
 
   const roleNames: Record<string, string> = {
     client: 'Клиент', confectioner: 'Кондитер', supplier: 'Поставщик',
-    decorator: 'Декоратор', animator: 'Аниматор', organizer: 'Организатор', admin: 'Администратор'
+    decorator: 'Магазин декора', animator: 'Аниматор', organizer: 'Организатор',
+    operator: 'Оператор', support: 'Поддержка', moderator: 'Модератор',
+    admin: 'Администратор', superadmin: 'Владелец платформы',
+    florist: 'Флорист', photographer: 'Фотограф', host: 'Ведущий',
+    caterer: 'Кейтеринг', venue: 'Площадка', courier: 'Курьер', corporate: 'Корпоративный клиент'
   };
 
   return (
@@ -187,12 +191,76 @@ export function DashboardSidebar() {
       { to: '/dashboard/products', label: 'Товары', icon: <Package className="w-4 h-4" /> },
       { to: '/dashboard/orders', label: 'Заказы', icon: <Package className="w-4 h-4" /> },
     ],
+    operator: [
+      { to: '/dashboard', label: 'Обзор', icon: <Home className="w-4 h-4" /> },
+      { to: '/dashboard/orders', label: 'Все заказы', icon: <Package className="w-4 h-4" /> },
+      { to: '/dashboard/support', label: 'Обращения', icon: <MessageCircle className="w-4 h-4" /> },
+    ],
+    support: [
+      { to: '/dashboard', label: 'Обзор', icon: <Home className="w-4 h-4" /> },
+      { to: '/dashboard/tickets', label: 'Тикеты', icon: <MessageCircle className="w-4 h-4" /> },
+      { to: '/dashboard/support', label: 'Обращения', icon: <Users className="w-4 h-4" /> },
+    ],
+    moderator: [
+      { to: '/dashboard', label: 'Обзор', icon: <Home className="w-4 h-4" /> },
+      { to: '/dashboard/moderation', label: 'Модерация', icon: <Shield className="w-4 h-4" /> },
+      { to: '/dashboard/users', label: 'Пользователи', icon: <Users className="w-4 h-4" /> },
+    ],
     admin: [
       { to: '/dashboard', label: 'Обзор', icon: <Home className="w-4 h-4" /> },
       { to: '/dashboard/users', label: 'Пользователи', icon: <Users className="w-4 h-4" /> },
       { to: '/dashboard/orders', label: 'Все заказы', icon: <Package className="w-4 h-4" /> },
       { to: '/dashboard/moderation', label: 'Модерация', icon: <Shield className="w-4 h-4" /> },
       { to: '/dashboard/analytics', label: 'Аналитика', icon: <BarChart3 className="w-4 h-4" /> },
+    ],
+    superadmin: [
+      { to: '/dashboard', label: 'Обзор', icon: <Home className="w-4 h-4" /> },
+      { to: '/dashboard/users', label: 'Пользователи', icon: <Users className="w-4 h-4" /> },
+      { to: '/dashboard/orders', label: 'Все заказы', icon: <Package className="w-4 h-4" /> },
+      { to: '/dashboard/moderation', label: 'Модерация', icon: <Shield className="w-4 h-4" /> },
+      { to: '/dashboard/analytics', label: 'Аналитика', icon: <BarChart3 className="w-4 h-4" /> },
+      { to: '/dashboard/settings', label: 'Настройки', icon: <Settings className="w-4 h-4" /> },
+    ],
+    florist: [
+      { to: '/dashboard', label: 'Обзор', icon: <Home className="w-4 h-4" /> },
+      { to: '/dashboard/services', label: 'Услуги', icon: <Package className="w-4 h-4" /> },
+      { to: '/dashboard/orders', label: 'Заказы', icon: <Package className="w-4 h-4" /> },
+      { to: '/dashboard/finance', label: 'Финансы', icon: <DollarSign className="w-4 h-4" /> },
+    ],
+    photographer: [
+      { to: '/dashboard', label: 'Обзор', icon: <Home className="w-4 h-4" /> },
+      { to: '/dashboard/services', label: 'Услуги', icon: <Package className="w-4 h-4" /> },
+      { to: '/dashboard/orders', label: 'Бронирования', icon: <CalendarDays className="w-4 h-4" /> },
+      { to: '/dashboard/finance', label: 'Финансы', icon: <DollarSign className="w-4 h-4" /> },
+    ],
+    host: [
+      { to: '/dashboard', label: 'Обзор', icon: <Home className="w-4 h-4" /> },
+      { to: '/dashboard/services', label: 'Программы', icon: <Package className="w-4 h-4" /> },
+      { to: '/dashboard/orders', label: 'Бронирования', icon: <CalendarDays className="w-4 h-4" /> },
+      { to: '/dashboard/finance', label: 'Финансы', icon: <DollarSign className="w-4 h-4" /> },
+    ],
+    caterer: [
+      { to: '/dashboard', label: 'Обзор', icon: <Home className="w-4 h-4" /> },
+      { to: '/dashboard/services', label: 'Меню', icon: <Package className="w-4 h-4" /> },
+      { to: '/dashboard/orders', label: 'Заказы', icon: <Package className="w-4 h-4" /> },
+      { to: '/dashboard/finance', label: 'Финансы', icon: <DollarSign className="w-4 h-4" /> },
+    ],
+    venue: [
+      { to: '/dashboard', label: 'Обзор', icon: <Home className="w-4 h-4" /> },
+      { to: '/dashboard/venues', label: 'Площадки', icon: <Package className="w-4 h-4" /> },
+      { to: '/dashboard/orders', label: 'Бронирования', icon: <CalendarDays className="w-4 h-4" /> },
+      { to: '/dashboard/finance', label: 'Финансы', icon: <DollarSign className="w-4 h-4" /> },
+    ],
+    courier: [
+      { to: '/dashboard', label: 'Обзор', icon: <Home className="w-4 h-4" /> },
+      { to: '/dashboard/deliveries', label: 'Доставки', icon: <Package className="w-4 h-4" /> },
+      { to: '/dashboard/finance', label: 'Заработок', icon: <DollarSign className="w-4 h-4" /> },
+    ],
+    corporate: [
+      { to: '/dashboard', label: 'Обзор', icon: <Home className="w-4 h-4" /> },
+      { to: '/dashboard/orders', label: 'Мои заказы', icon: <Package className="w-4 h-4" /> },
+      { to: '/dashboard/events', label: 'Мероприятия', icon: <CalendarDays className="w-4 h-4" /> },
+      { to: '/dashboard/profile', label: 'Профиль компании', icon: <User className="w-4 h-4" /> },
     ],
   };
 

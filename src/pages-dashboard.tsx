@@ -70,10 +70,10 @@ export function DashboardOverview() {
     );
   }
 
-  if (role === 'admin') {
+  if (role === 'admin' || role === 'superadmin') {
     return (
       <div className="p-6">
-        <h1 className="font-display text-2xl font-bold mb-2">Админ-панель</h1>
+        <h1 className="font-display text-2xl font-bold mb-2">{role === 'superadmin' ? 'Панель владельца' : 'Админ-панель'}</h1>
         <p className="text-stone-600 text-sm mb-6">Управление платформой</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">{store.users.length}</p><p className="text-xs text-stone-500">Пользователей</p></div>
@@ -81,6 +81,22 @@ export function DashboardOverview() {
           <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">{store.orders.length}</p><p className="text-xs text-stone-500">Заказов</p></div>
           <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">{store.orders.reduce((s, o) => s + o.total, 0).toLocaleString()} ₽</p><p className="text-xs text-stone-500">Оборот</p></div>
         </div>
+        {role === 'superadmin' && (
+          <div className="bg-white rounded-xl border border-stone-200 p-6 mb-6">
+            <h2 className="font-semibold mb-4">Статистика по ролям</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {['client', 'confectioner', 'supplier', 'decorator', 'animator', 'organizer', 'florist', 'photographer', 'host', 'caterer', 'venue', 'courier', 'corporate'].map(r => {
+                const count = store.users.filter(u => u.role === r).length;
+                return (
+                  <div key={r} className="bg-stone-50 rounded-lg p-3">
+                    <p className="text-lg font-bold">{count}</p>
+                    <p className="text-xs text-stone-500 capitalize">{r}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
         <div className="bg-white rounded-xl border border-stone-200 p-6">
           <h2 className="font-semibold mb-4">Последние заказы</h2>
           <div className="space-y-2">
@@ -94,6 +110,120 @@ export function DashboardOverview() {
               );
             })}
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (role === 'operator') {
+    const allOrders = store.orders;
+    const newOrders = allOrders.filter(o => o.status === 'new');
+    return (
+      <div className="p-6">
+        <h1 className="font-display text-2xl font-bold mb-2">Панель оператора</h1>
+        <p className="text-stone-600 text-sm mb-6">Работа с обращениями и заказами</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">{newOrders.length}</p><p className="text-xs text-stone-500">Новых заказов</p></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">{allOrders.length}</p><p className="text-xs text-stone-500">Всего заказов</p></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">{store.users.length}</p><p className="text-xs text-stone-500">Пользователей</p></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">0</p><p className="text-xs text-stone-500">Обращений</p></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (role === 'support') {
+    return (
+      <div className="p-6">
+        <h1 className="font-display text-2xl font-bold mb-2">Служба поддержки</h1>
+        <p className="text-stone-600 text-sm mb-6">Обработка обращений пользователей</p>
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">0</p><p className="text-xs text-stone-500">Открытых тикетов</p></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">0</p><p className="text-xs text-stone-500">В работе</p></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">0</p><p className="text-xs text-stone-500">Закрыто</p></div>
+        </div>
+        <div className="bg-white rounded-xl border border-stone-200 p-8 text-center">
+          <div className="text-5xl mb-4">🎫</div>
+          <h3 className="font-semibold mb-2">Нет активных тикетов</h3>
+          <p className="text-sm text-stone-500">Все обращения обработаны</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (role === 'moderator') {
+    return (
+      <div className="p-6">
+        <h1 className="font-display text-2xl font-bold mb-2">Модерация</h1>
+        <p className="text-stone-600 text-sm mb-6">Проверка контента и профилей</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">0</p><p className="text-xs text-stone-500">На проверке</p></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">{store.products.length}</p><p className="text-xs text-stone-500">Товаров</p></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">{store.users.length}</p><p className="text-xs text-stone-500">Пользователей</p></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">0</p><p className="text-xs text-stone-500">Жалоб</p></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (['florist', 'photographer', 'host', 'caterer', 'venue'].includes(role)) {
+    const roleNames: Record<string, string> = {
+      florist: 'Флорист',
+      photographer: 'Фотограф',
+      host: 'Ведущий',
+      caterer: 'Кейтеринг',
+      venue: 'Площадка'
+    };
+    return (
+      <div className="p-6">
+        <h1 className="font-display text-2xl font-bold mb-2">Кабинет: {roleNames[role]}</h1>
+        <p className="text-stone-600 text-sm mb-6">{currentUser.name}</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">0</p><p className="text-xs text-stone-500">Бронирований</p></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">0</p><p className="text-xs text-stone-500">Активных</p></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">0 ₽</p><p className="text-xs text-stone-500">Доход</p></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">{currentUser.rating || '—'}</p><p className="text-xs text-stone-500">Рейтинг</p></div>
+        </div>
+        <div className="bg-white rounded-xl border border-stone-200 p-8 text-center">
+          <div className="text-5xl mb-4">{role === 'florist' ? '🌸' : role === 'photographer' ? '📸' : role === 'host' ? '🎤' : role === 'caterer' ? '🍽️' : '🏛️'}</div>
+          <h3 className="font-semibold mb-2">Добро пожаловать!</h3>
+          <p className="text-sm text-stone-500">Используйте боковое меню для управления услугами и бронированиями</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (role === 'courier') {
+    return (
+      <div className="p-6">
+        <h1 className="font-display text-2xl font-bold mb-2">Панель курьера</h1>
+        <p className="text-stone-600 text-sm mb-6">Управление доставками</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">0</p><p className="text-xs text-stone-500">Активных доставок</p></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">0</p><p className="text-xs text-stone-500">Выполнено сегодня</p></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">0 ₽</p><p className="text-xs text-stone-500">Заработано</p></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">0</p><p className="text-xs text-stone-500">Рейтинг</p></div>
+        </div>
+        <div className="bg-white rounded-xl border border-stone-200 p-8 text-center">
+          <div className="text-5xl mb-4">🚚</div>
+          <h3 className="font-semibold mb-2">Нет активных доставок</h3>
+          <p className="text-sm text-stone-500">Новые заказы появятся здесь</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (role === 'corporate') {
+    const myOrders = store.orders.filter(o => o.buyerId === currentUser.id);
+    return (
+      <div className="p-6">
+        <h1 className="font-display text-2xl font-bold mb-2">Корпоративный кабинет</h1>
+        <p className="text-stone-600 text-sm mb-6">{currentUser.name}</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">{myOrders.length}</p><p className="text-xs text-stone-500">Заказов</p></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">{store.events.filter(e => e.organizerId === currentUser.id).length}</p><p className="text-xs text-stone-500">Мероприятий</p></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">{myOrders.reduce((s, o) => s + o.total, 0).toLocaleString()} ₽</p><p className="text-xs text-stone-500">Потрачено</p></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-5"><p className="text-2xl font-bold">0</p><p className="text-xs text-stone-500">Бонусов</p></div>
         </div>
       </div>
     );
@@ -379,7 +509,14 @@ export function DashboardProduction() {
 // ==================== DASHBOARD USERS (ADMIN) ====================
 export function DashboardUsers() {
   const { store } = useStore();
-  const roleNames: Record<string, string> = { client: 'Клиент', confectioner: 'Кондитер', supplier: 'Поставщик', decorator: 'Декоратор', animator: 'Аниматор', organizer: 'Организатор', admin: 'Админ' };
+  const roleNames: Record<string, string> = { 
+    client: 'Клиент', confectioner: 'Кондитер', supplier: 'Поставщик', 
+    decorator: 'Магазин декора', animator: 'Аниматор', organizer: 'Организатор',
+    operator: 'Оператор', support: 'Поддержка', moderator: 'Модератор',
+    admin: 'Администратор', superadmin: 'Владелец платформы',
+    florist: 'Флорист', photographer: 'Фотограф', host: 'Ведущий',
+    caterer: 'Кейтеринг', venue: 'Площадка', courier: 'Курьер', corporate: 'Корпоративный клиент'
+  };
 
   return (
     <div className="p-6">
@@ -439,6 +576,109 @@ export function DashboardModeration() {
 
 export function DashboardAnalytics() {
   return <div className="p-6"><h1 className="font-display text-2xl font-bold mb-6">Аналитика</h1><p className="text-stone-500">Статистика платформы</p></div>;
+}
+
+export function DashboardServices() {
+  const currentUser = useCurrentUser();
+  if (!currentUser) return null;
+  return (
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-display text-2xl font-bold">Мои услуги</h1>
+        <button className="flex items-center gap-2 bg-rose-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-rose-700"><Plus className="w-4 h-4" /> Добавить услугу</button>
+      </div>
+      <div className="bg-white rounded-xl border border-stone-200 p-8 text-center">
+        <div className="text-5xl mb-4">📋</div>
+        <h3 className="font-semibold mb-2">Нет опубликованных услуг</h3>
+        <p className="text-sm text-stone-500">Добавьте первую услугу для получения заказов</p>
+      </div>
+    </div>
+  );
+}
+
+export function DashboardVenues() {
+  return (
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-display text-2xl font-bold">Мои площадки</h1>
+        <button className="flex items-center gap-2 bg-rose-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-rose-700"><Plus className="w-4 h-4" /> Добавить площадку</button>
+      </div>
+      <div className="bg-white rounded-xl border border-stone-200 p-8 text-center">
+        <div className="text-5xl mb-4">🏛️</div>
+        <h3 className="font-semibold mb-2">Нет добавленных площадок</h3>
+        <p className="text-sm text-stone-500">Добавьте площадку для бронирований</p>
+      </div>
+    </div>
+  );
+}
+
+export function DashboardDeliveries() {
+  return (
+    <div className="p-6">
+      <h1 className="font-display text-2xl font-bold mb-6">Доставки</h1>
+      <div className="bg-white rounded-xl border border-stone-200 p-8 text-center">
+        <div className="text-5xl mb-4">🚚</div>
+        <h3 className="font-semibold mb-2">Нет активных доставок</h3>
+        <p className="text-sm text-stone-500">Новые заказы на доставку появятся здесь</p>
+      </div>
+    </div>
+  );
+}
+
+export function DashboardTickets() {
+  return (
+    <div className="p-6">
+      <h1 className="font-display text-2xl font-bold mb-6">Тикеты поддержки</h1>
+      <div className="bg-white rounded-xl border border-stone-200 p-8 text-center">
+        <div className="text-5xl mb-4">🎫</div>
+        <h3 className="font-semibold mb-2">Нет активных тикетов</h3>
+        <p className="text-sm text-stone-500">Все обращения обработаны</p>
+      </div>
+    </div>
+  );
+}
+
+export function DashboardSupport() {
+  return (
+    <div className="p-6">
+      <h1 className="font-display text-2xl font-bold mb-6">Обращения</h1>
+      <div className="bg-white rounded-xl border border-stone-200 p-8 text-center">
+        <div className="text-5xl mb-4">💬</div>
+        <h3 className="font-semibold mb-2">Нет новых обращений</h3>
+        <p className="text-sm text-stone-500">Обращения пользователей появятся здесь</p>
+      </div>
+    </div>
+  );
+}
+
+export function DashboardSettings() {
+  return (
+    <div className="p-6">
+      <h1 className="font-display text-2xl font-bold mb-6">Настройки платформы</h1>
+      <div className="space-y-4">
+        <div className="bg-white rounded-xl border border-stone-200 p-6">
+          <h3 className="font-semibold mb-4">Общие настройки</h3>
+          <div className="space-y-3">
+            <div><label className="text-sm font-medium mb-1 block">Название платформы</label><input type="text" defaultValue="Conditera" className="w-full px-3 py-2 rounded-lg border border-stone-200 text-sm" /></div>
+            <div><label className="text-sm font-medium mb-1 block">Комиссия платформы (%)</label><input type="number" defaultValue="8" className="w-full px-3 py-2 rounded-lg border border-stone-200 text-sm" /></div>
+            <div><label className="text-sm font-medium mb-1 block">Валюта</label><select className="w-full px-3 py-2 rounded-lg border border-stone-200 text-sm"><option>Рубль (₽)</option><option>Доллар ($)</option><option>Евро (€)</option></select></div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl border border-stone-200 p-6">
+          <h3 className="font-semibold mb-4">Модули платформы</h3>
+          <div className="space-y-2">
+            {['Маркетплейс', 'Конструктор тортов', 'Мероприятия', 'B2B', 'Доставка', 'AI-помощник'].map(module => (
+              <label key={module} className="flex items-center gap-3 p-2 rounded-lg hover:bg-stone-50">
+                <input type="checkbox" defaultChecked className="accent-rose-600" />
+                <span className="text-sm">{module}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+        <button className="bg-rose-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-rose-700">Сохранить настройки</button>
+      </div>
+    </div>
+  );
 }
 
 export function ProjectsPage() {

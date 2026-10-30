@@ -507,7 +507,7 @@ export function AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [role, setRole] = useState<'client' | 'confectioner' | 'supplier' | 'decorator' | 'animator' | 'organizer'>('client');
+  const [role, setRole] = useState<'client' | 'confectioner' | 'supplier' | 'decorator' | 'animator' | 'organizer' | 'florist' | 'photographer' | 'host' | 'caterer' | 'venue' | 'courier' | 'corporate'>('client');
   const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -554,6 +554,18 @@ export function AuthPage() {
               <button onClick={() => quickLogin('anna@conditera.ru')} className="px-3 py-2 bg-stone-50 rounded-lg text-xs hover:bg-stone-100">🎂 Кондитер</button>
               <button onClick={() => quickLogin('supplier@moloko.ru')} className="px-3 py-2 bg-stone-50 rounded-lg text-xs hover:bg-stone-100">📦 Поставщик</button>
               <button onClick={() => quickLogin('admin@conditera.ru')} className="px-3 py-2 bg-stone-50 rounded-lg text-xs hover:bg-stone-100">🛡️ Админ</button>
+              <button onClick={() => quickLogin('super@conditera.ru')} className="px-3 py-2 bg-stone-50 rounded-lg text-xs hover:bg-stone-100">👑 Super Admin</button>
+              <button onClick={() => quickLogin('moderator@conditera.ru')} className="px-3 py-2 bg-stone-50 rounded-lg text-xs hover:bg-stone-100">🔍 Модератор</button>
+              <button onClick={() => quickLogin('operator@conditera.ru')} className="px-3 py-2 bg-stone-50 rounded-lg text-xs hover:bg-stone-100">🎧 Оператор</button>
+              <button onClick={() => quickLogin('support@conditera.ru')} className="px-3 py-2 bg-stone-50 rounded-lg text-xs hover:bg-stone-100">💬 Поддержка</button>
+              <button onClick={() => quickLogin('flora@lavanda.ru')} className="px-3 py-2 bg-stone-50 rounded-lg text-xs hover:bg-stone-100">🌸 Флорист</button>
+              <button onClick={() => quickLogin('photo@objectiv.ru')} className="px-3 py-2 bg-stone-50 rounded-lg text-xs hover:bg-stone-100">📸 Фотограф</button>
+              <button onClick={() => quickLogin('host@prazdnik.ru')} className="px-3 py-2 bg-stone-50 rounded-lg text-xs hover:bg-stone-100">🎤 Ведущий</button>
+              <button onClick={() => quickLogin('catering@vkusno.ru')} className="px-3 py-2 bg-stone-50 rounded-lg text-xs hover:bg-stone-100">🍽️ Кейтеринг</button>
+              <button onClick={() => quickLogin('venue@beliySad.ru')} className="px-3 py-2 bg-stone-50 rounded-lg text-xs hover:bg-stone-100">🏛️ Площадка</button>
+              <button onClick={() => quickLogin('courier@delivery.ru')} className="px-3 py-2 bg-stone-50 rounded-lg text-xs hover:bg-stone-100">🚚 Курьер</button>
+              <button onClick={() => quickLogin('corp@company.ru')} className="px-3 py-2 bg-stone-50 rounded-lg text-xs hover:bg-stone-100">🏢 Корпоративный</button>
+              <button onClick={() => quickLogin('anim@fun.ru')} className="px-3 py-2 bg-stone-50 rounded-lg text-xs hover:bg-stone-100">🎭 Аниматор</button>
             </div>
           </div>
 
@@ -568,10 +580,17 @@ export function AuthPage() {
                 <select value={role} onChange={(e) => setRole(e.target.value as any)} className="w-full px-4 py-3 rounded-xl border border-stone-200 text-sm">
                   <option value="client">Клиент</option>
                   <option value="confectioner">Кондитер</option>
-                  <option value="supplier">Поставщик</option>
+                  <option value="supplier">Поставщик ингредиентов</option>
                   <option value="decorator">Магазин декора</option>
                   <option value="animator">Аниматор</option>
-                  <option value="organizer">Организатор</option>
+                  <option value="organizer">Организатор мероприятий</option>
+                  <option value="florist">Флорист</option>
+                  <option value="photographer">Фотограф</option>
+                  <option value="host">Ведущий</option>
+                  <option value="caterer">Кейтеринг</option>
+                  <option value="venue">Площадка</option>
+                  <option value="courier">Курьер</option>
+                  <option value="corporate">Корпоративный клиент</option>
                 </select>
               </>
             )}

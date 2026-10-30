@@ -9,6 +9,17 @@ export const initialUsers: User[] = [
   { id: 'u6', email: 'anim@fun.ru', name: 'Аниматор Весельчак', role: 'animator', phone: '+7 (900) 666-77-88', city: 'Москва', about: 'Детские праздники, шоу программы', rating: 5.0, joinedAt: '2024-05-01' },
   { id: 'u7', email: 'org@event.ru', name: 'Event-агентство «Праздник»', role: 'organizer', phone: '+7 (900) 777-88-99', city: 'Москва', about: 'Организация свадеб и корпоративов', joinedAt: '2024-03-01' },
   { id: 'u8', email: 'admin@conditera.ru', name: 'Администратор', role: 'admin', joinedAt: '2024-01-01' },
+  { id: 'u9', email: 'super@conditera.ru', name: 'Владелец платформы', role: 'superadmin', joinedAt: '2024-01-01' },
+  { id: 'u10', email: 'operator@conditera.ru', name: 'Оператор поддержки', role: 'operator', phone: '+7 (900) 888-99-00', city: 'Москва', about: 'Обработка обращений клиентов', joinedAt: '2024-04-01' },
+  { id: 'u11', email: 'support@conditera.ru', name: 'Служба поддержки', role: 'support', phone: '+7 (900) 999-00-11', city: 'Москва', about: 'Техническая поддержка пользователей', joinedAt: '2024-04-15' },
+  { id: 'u12', email: 'moderator@conditera.ru', name: 'Модератор контента', role: 'moderator', joinedAt: '2024-05-01' },
+  { id: 'u13', email: 'flora@lavanda.ru', name: 'Флористика «Лаванда»', role: 'florist', phone: '+7 (900) 111-22-44', city: 'Санкт-Петербург', about: 'Живые цветы для декора тортов и мероприятий', rating: 4.8, joinedAt: '2024-03-20' },
+  { id: 'u14', email: 'photo@objectiv.ru', name: 'Фото-студия «Объектив»', role: 'photographer', phone: '+7 (900) 222-33-55', city: 'Москва', about: 'Фуд-фотография, съёмка мероприятий', rating: 4.9, joinedAt: '2024-02-15' },
+  { id: 'u15', email: 'host@prazdnik.ru', name: 'Ведущий Максим', role: 'host', phone: '+7 (900) 333-44-66', city: 'Москва', about: 'Ведущий свадеб и корпоративов', rating: 5.0, joinedAt: '2024-04-10' },
+  { id: 'u16', email: 'catering@vkusno.ru', name: 'Кейтеринг «Вкусно»', role: 'caterer', phone: '+7 (900) 444-55-77', city: 'Москва', about: 'Выездное обслуживание мероприятий', rating: 4.7, joinedAt: '2024-03-05' },
+  { id: 'u17', email: 'venue@beliySad.ru', name: 'Ресторан «Белый сад»', role: 'venue', phone: '+7 (900) 555-66-88', city: 'Москва', about: 'Площадка для свадеб и банкетов до 150 человек', rating: 4.6, joinedAt: '2024-02-20' },
+  { id: 'u18', email: 'courier@delivery.ru', name: 'Курьерская служба', role: 'courier', phone: '+7 (900) 666-77-99', city: 'Москва', about: 'Доставка тортов и десертов по городу', joinedAt: '2024-05-10' },
+  { id: 'u19', email: 'corp@company.ru', name: 'ООО «Ромашка»', role: 'corporate', phone: '+7 (900) 777-88-00', city: 'Москва', about: 'Корпоративные заказы на мероприятия', joinedAt: '2024-06-01' },
 ];
 
 export const initialProducts: Product[] = [
