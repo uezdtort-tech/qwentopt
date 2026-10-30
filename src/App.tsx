@@ -3,6 +3,9 @@ import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { StoreCtx, loadStore, saveStore } from './store';
 import { Header, Footer, DashboardSidebar } from './components';
 import { HomePage, CatalogPage, ProductPage, ConstructorPage, CartPage, AuthPage, ChatPage, EventsPage, B2BPage } from './pages-public';
+import { AIAssistantPage } from './innovations/AIAssistant/AIAssistantPage';
+import { VisualConstructorPage } from './innovations/VisualConstructor/VisualConstructorPage';
+import { AdvancedAnalyticsPage } from './innovations/Analytics/AdvancedAnalyticsPage';
 import { DashboardOverview, DashboardOrders, DashboardProducts, DashboardRecipes, DashboardInventory, DashboardFinance, DashboardCustomers, DashboardProduction, DashboardUsers, DashboardFavorites, DashboardProfile, DashboardEvents, DashboardModeration, DashboardAnalytics, DashboardServices, DashboardVenues, DashboardDeliveries, DashboardTickets, DashboardSupport, DashboardSettings, ProjectsPage } from './pages-dashboard';
 import { IntegrationsPage } from './pages-dashboard/IntegrationsPage';
 
@@ -31,7 +34,7 @@ function AppRoutes() {
               <Route path="/dashboard/profile" element={<DashboardProfile />} />
               <Route path="/dashboard/events" element={<DashboardEvents />} />
               <Route path="/dashboard/moderation" element={<DashboardModeration />} />
-              <Route path="/dashboard/analytics" element={<DashboardAnalytics />} />
+              <Route path="/dashboard/analytics" element={<AdvancedAnalyticsPage />} />
               <Route path="/dashboard/services" element={<DashboardServices />} />
               <Route path="/dashboard/venues" element={<DashboardVenues />} />
               <Route path="/dashboard/deliveries" element={<DashboardDeliveries />} />
@@ -55,6 +58,8 @@ function AppRoutes() {
           <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/product/:id" element={<ProductPage />} />
           <Route path="/constructor" element={<ConstructorPage />} />
+          <Route path="/ai-assistant" element={<AIAssistantPage />} />
+          <Route path="/visual-constructor" element={<VisualConstructorPage />} />
           <Route path="/events" element={<EventsPage />} />
           <Route path="/b2b" element={<B2BPage />} />
           <Route path="/chat" element={<ChatPage />} />

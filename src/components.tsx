@@ -37,6 +37,8 @@ export function Header() {
           <Link to="/" className={`text-sm font-medium ${location.pathname === '/' ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>Главная</Link>
           <Link to="/catalog" className={`text-sm font-medium ${location.pathname.startsWith('/catalog') ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>Каталог</Link>
           <Link to="/constructor" className={`text-sm font-medium ${location.pathname === '/constructor' ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>Конструктор</Link>
+          <Link to="/ai-assistant" className={`text-sm font-medium ${location.pathname === '/ai-assistant' ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>AI-помощник</Link>
+          <Link to="/visual-constructor" className={`text-sm font-medium ${location.pathname === '/visual-constructor' ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>Визуальный конструктор</Link>
           <Link to="/events" className={`text-sm font-medium ${location.pathname === '/events' ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>Мероприятия</Link>
           <Link to="/b2b" className={`text-sm font-medium ${location.pathname === '/b2b' ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>Партнёрам</Link>
           {currentUser && (
