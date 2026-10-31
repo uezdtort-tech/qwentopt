@@ -9,6 +9,7 @@ import { AdvancedAnalyticsPage } from './innovations/Analytics/AdvancedAnalytics
 import { AICakeGeneratorPage } from './innovations/AICakeGenerator/AICakeGeneratorPage';
 import { EventPlannerProPage } from './innovations/EventPlannerPro/EventPlannerProPage';
 import { B2BMarketplacePage } from './innovations/B2BMarketplace/B2BMarketplacePage';
+import { VisualConstructorV2Page } from './innovations/VisualConstructorV2/VisualConstructorV2Page';
 import { DashboardOverview, DashboardOrders, DashboardProducts, DashboardRecipes, DashboardInventory, DashboardFinance, DashboardCustomers, DashboardProduction, DashboardUsers, DashboardFavorites, DashboardProfile, DashboardEvents, DashboardModeration, DashboardAnalytics, DashboardServices, DashboardVenues, DashboardDeliveries, DashboardTickets, DashboardSupport, DashboardSettings, ProjectsPage } from './pages-dashboard';
 import { IntegrationsPage } from './pages-dashboard/IntegrationsPage';
 
@@ -66,6 +67,7 @@ function AppRoutes() {
           <Route path="/ai-cake-generator" element={<AICakeGeneratorPage />} />
           <Route path="/event-planner-pro" element={<EventPlannerProPage />} />
           <Route path="/b2b-marketplace" element={<B2BMarketplacePage />} />
+          <Route path="/visual-constructor-v2" element={<VisualConstructorV2Page />} />
           <Route path="/events" element={<EventsPage />} />
           <Route path="/b2b" element={<B2BPage />} />
           <Route path="/chat" element={<ChatPage />} />
