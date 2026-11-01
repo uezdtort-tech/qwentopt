@@ -1,15 +1,16 @@
 /**
- * Инновация #7: B2B Marketplace
+ * Инновация #7: B2B Marketplace V2
  * 
  * Проблема: Кондитерам сложно находить поставщиков, сравнивать цены, управлять заказами.
  * Текущее решение: Разрозненные контакты, ручное сравнение, нет централизованной платформы.
  * Новое решение: B2B-маркетплейс с:
  * - Каталогом поставщиков и товаров
  * - Системой тендеров
- * - Сравнением цен
+ * - Сравнением цен (до 4 товаров одновременно)
  * - Управлением заказами
  * - Рейтингами и отзывами
- * - Автоматическим расчетом себестоимости
+ * - Калькулятором себестоимости
+ * - Умными фильтрами и сортировкой
  * 
  * Почему лучше:
  * - Экономит время на поиск поставщиков на 60-70%
@@ -26,8 +27,8 @@
  * Сложность: P1, 5-7 дней
  */
 
-import React, { useState } from 'react';
-import { Search, Filter, Star, MapPin, Truck, Package, TrendingUp, Plus, Eye, MessageCircle } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Search, Filter, Star, MapPin, Truck, Package, TrendingUp, Plus, Eye, MessageCircle, GitCompare, Calculator, X, Check } from 'lucide-react';
 
 interface Supplier {
   id: string;
@@ -193,10 +194,16 @@ const TENDERS: Tender[] = [
 ];
 
 export function B2BMarketplacePage() {
-  const [activeTab, setActiveTab] = useState<'suppliers' | 'products' | 'tenders'>('suppliers');
+  const [activeTab, setActiveTab] = useState<'suppliers' | 'products' | 'tenders' | 'compare' | 'calculator'>('suppliers');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
+  const [compareList, setCompareList] = useState<Product[]>([]);
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [calculatorRecipe, setCalculatorRecipe] = useState<{
+    name: string;
+    ingredients: { productId: string; quantity: number }[];
+  }>({ name: '', ingredients: [] });
 
   const categories = ['all', 'Молочные продукты', 'Мука и крупы', 'Шоколад и какао', 'Фрукты и ягоды'];
 
@@ -215,6 +222,47 @@ export function B2BMarketplacePage() {
 
   const getSupplierById = (id: string) => SUPPLIERS.find(s => s.id === id);
 
+  const toggleCompare = (product: Product) => {
+    if (compareList.find(p => p.id === product.id)) {
+      setCompareList(compareList.filter(p => p.id !== product.id));
+    } else if (compareList.length < 4) {
+      setCompareList([...compareList, product]);
+    } else {
+      alert('Можно сравнить максимум 4 товара');
+    }
+  };
+
+  const calculateRecipeCost = () => {
+    let totalCost = 0;
+    calculatorRecipe.ingredients.forEach(ing => {
+      const product = PRODUCTS.find(p => p.id === ing.productId);
+      if (product) {
+        totalCost += product.price * ing.quantity;
+      }
+    });
+    return totalCost;
+  };
+
+  const addIngredientToCalculator = () => {
+    setCalculatorRecipe({
+      ...calculatorRecipe,
+      ingredients: [...calculatorRecipe.ingredients, { productId: '', quantity: 0 }]
+    });
+  };
+
+  const updateIngredient = (index: number, field: 'productId' | 'quantity', value: string | number) => {
+    const newIngredients = [...calculatorRecipe.ingredients];
+    newIngredients[index] = { ...newIngredients[index], [field]: value };
+    setCalculatorRecipe({ ...calculatorRecipe, ingredients: newIngredients });
+  };
+
+  const removeIngredient = (index: number) => {
+    setCalculatorRecipe({
+      ...calculatorRecipe,
+      ingredients: calculatorRecipe.ingredients.filter((_, i) => i !== index)
+    });
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="mb-8">
@@ -226,10 +274,10 @@ export function B2BMarketplacePage() {
       </div>
 
       {/* Табы */}
-      <div className="flex gap-2 mb-6 border-b border-stone-200">
+      <div className="flex gap-2 mb-6 border-b border-stone-200 overflow-x-auto">
         <button
           onClick={() => setActiveTab('suppliers')}
-          className={`px-6 py-3 font-medium transition-colors ${
+          className={`px-6 py-3 font-medium transition-colors whitespace-nowrap ${
             activeTab === 'suppliers'
               ? 'text-rose-600 border-b-2 border-rose-600'
               : 'text-stone-600 hover:text-rose-600'
@@ -239,7 +287,7 @@ export function B2BMarketplacePage() {
         </button>
         <button
           onClick={() => setActiveTab('products')}
-          className={`px-6 py-3 font-medium transition-colors ${
+          className={`px-6 py-3 font-medium transition-colors whitespace-nowrap ${
             activeTab === 'products'
               ? 'text-rose-600 border-b-2 border-rose-600'
               : 'text-stone-600 hover:text-rose-600'
@@ -249,13 +297,40 @@ export function B2BMarketplacePage() {
         </button>
         <button
           onClick={() => setActiveTab('tenders')}
-          className={`px-6 py-3 font-medium transition-colors ${
+          className={`px-6 py-3 font-medium transition-colors whitespace-nowrap ${
             activeTab === 'tenders'
               ? 'text-rose-600 border-b-2 border-rose-600'
               : 'text-stone-600 hover:text-rose-600'
           }`}
         >
           Тендеры
+        </button>
+        <button
+          onClick={() => setActiveTab('compare')}
+          className={`px-6 py-3 font-medium transition-colors whitespace-nowrap flex items-center gap-2 ${
+            activeTab === 'compare'
+              ? 'text-rose-600 border-b-2 border-rose-600'
+              : 'text-stone-600 hover:text-rose-600'
+          }`}
+        >
+          <GitCompare className="w-4 h-4" />
+          Сравнение
+          {compareList.length > 0 && (
+            <span className="bg-rose-600 text-white text-xs px-2 py-0.5 rounded-full">
+              {compareList.length}
+            </span>
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab('calculator')}
+          className={`px-6 py-3 font-medium transition-colors whitespace-nowrap flex items-center gap-2 ${
+            activeTab === 'calculator'
+              ? 'text-rose-600 border-b-2 border-rose-600'
+              : 'text-stone-600 hover:text-rose-600'
+          }`}
+        >
+          <Calculator className="w-4 h-4" />
+          Калькулятор
         </button>
       </div>
 
@@ -383,10 +458,32 @@ export function B2BMarketplacePage() {
                   </div>
                 </div>
 
-                <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors">
-                  <Plus className="w-4 h-4" />
-                  Заказать
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => toggleCompare(product)}
+                    className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                      compareList.find(p => p.id === product.id)
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                    }`}
+                  >
+                    {compareList.find(p => p.id === product.id) ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        В сравнении
+                      </>
+                    ) : (
+                      <>
+                        <GitCompare className="w-4 h-4" />
+                        Сравнить
+                      </>
+                    )}
+                  </button>
+                  <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors">
+                    <Plus className="w-4 h-4" />
+                    Заказать
+                  </button>
+                </div>
               </div>
             );
           })}
@@ -458,6 +555,229 @@ export function B2BMarketplacePage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Вкладка сравнения */}
+      {activeTab === 'compare' && (
+        <div>
+          {compareList.length === 0 ? (
+            <div className="bg-white rounded-xl border border-stone-200 p-12 text-center">
+              <GitCompare className="w-16 h-16 text-stone-300 mx-auto mb-4" />
+              <h3 className="font-semibold text-lg text-stone-800 mb-2">Список сравнения пуст</h3>
+              <p className="text-stone-600 mb-4">Добавьте товары из каталога для сравнения</p>
+              <button
+                onClick={() => setActiveTab('products')}
+                className="px-6 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors"
+              >
+                Перейти к каталогу
+              </button>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-stone-200 p-6">
+              <h3 className="font-semibold text-lg mb-4">Сравнение товаров</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-stone-200">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-stone-600">Параметр</th>
+                      {compareList.map(product => (
+                        <th key={product.id} className="text-center py-3 px-4 text-sm font-medium text-stone-800">
+                          <div className="flex flex-col items-center gap-2">
+                            <span className="text-3xl">{product.image}</span>
+                            <span className="text-xs">{product.name}</span>
+                          </div>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-stone-100">
+                      <td className="py-3 px-4 text-sm font-medium text-stone-600">Цена</td>
+                      {compareList.map(product => (
+                        <td key={product.id} className="py-3 px-4 text-center">
+                          <span className="font-bold text-rose-600">{product.price.toLocaleString()} ₽/{product.unit}</span>
+                        </td>
+                      ))}
+                    </tr>
+                    <tr className="border-b border-stone-100">
+                      <td className="py-3 px-4 text-sm font-medium text-stone-600">Мин. количество</td>
+                      {compareList.map(product => (
+                        <td key={product.id} className="py-3 px-4 text-center text-sm">
+                          {product.minQuantity} {product.unit}
+                        </td>
+                      ))}
+                    </tr>
+                    <tr className="border-b border-stone-100">
+                      <td className="py-3 px-4 text-sm font-medium text-stone-600">Поставщик</td>
+                      {compareList.map(product => {
+                        const supplier = getSupplierById(product.supplierId);
+                        return (
+                          <td key={product.id} className="py-3 px-4 text-center text-sm">
+                            {supplier?.name}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                    <tr className="border-b border-stone-100">
+                      <td className="py-3 px-4 text-sm font-medium text-stone-600">Рейтинг поставщика</td>
+                      {compareList.map(product => {
+                        const supplier = getSupplierById(product.supplierId);
+                        return (
+                          <td key={product.id} className="py-3 px-4 text-center">
+                            <div className="flex items-center justify-center gap-1">
+                              <Star className="w-4 h-4 text-amber-500 fill-current" />
+                              <span className="text-sm font-medium">{supplier?.rating}</span>
+                            </div>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                    <tr className="border-b border-stone-100">
+                      <td className="py-3 px-4 text-sm font-medium text-stone-600">Срок доставки</td>
+                      {compareList.map(product => {
+                        const supplier = getSupplierById(product.supplierId);
+                        return (
+                          <td key={product.id} className="py-3 px-4 text-center text-sm">
+                            {supplier?.deliveryTime}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                    <tr>
+                      <td className="py-3 px-4 text-sm font-medium text-stone-600">В наличии</td>
+                      {compareList.map(product => (
+                        <td key={product.id} className="py-3 px-4 text-center">
+                          <span className={`text-sm font-medium ${product.inStock ? 'text-emerald-600' : 'text-rose-600'}`}>
+                            {product.inStock ? 'Да' : 'Нет'}
+                          </span>
+                        </td>
+                      ))}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className="mt-4 flex gap-2">
+                <button
+                  onClick={() => setCompareList([])}
+                  className="px-4 py-2 bg-stone-100 text-stone-700 rounded-lg hover:bg-stone-200 transition-colors"
+                >
+                  Очистить список
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Вкладка калькулятора */}
+      {activeTab === 'calculator' && (
+        <div className="bg-white rounded-xl border border-stone-200 p-6">
+          <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+            <Calculator className="w-5 h-5 text-rose-600" />
+            Калькулятор себестоимости
+          </h3>
+          <p className="text-sm text-stone-600 mb-6">
+            Рассчитайте себестоимость вашего продукта на основе закупочных цен
+          </p>
+
+          <div className="mb-6">
+            <label className="text-sm font-medium text-stone-700 mb-2 block">
+              Название рецепта/продукта
+            </label>
+            <input
+              type="text"
+              value={calculatorRecipe.name}
+              onChange={(e) => setCalculatorRecipe({ ...calculatorRecipe, name: e.target.value })}
+              placeholder="Например: Медовик классический"
+              className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-rose-300"
+            />
+          </div>
+
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-sm font-medium text-stone-700">Ингредиенты</label>
+              <button
+                onClick={addIngredientToCalculator}
+                className="flex items-center gap-2 px-3 py-1.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors text-sm"
+              >
+                <Plus className="w-4 h-4" />
+                Добавить ингредиент
+              </button>
+            </div>
+
+            {calculatorRecipe.ingredients.length === 0 ? (
+              <div className="text-center py-8 bg-stone-50 rounded-xl">
+                <p className="text-stone-500">Добавьте ингредиенты для расчёта себестоимости</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {calculatorRecipe.ingredients.map((ing, index) => {
+                  const product = PRODUCTS.find(p => p.id === ing.productId);
+                  return (
+                    <div key={index} className="flex gap-3 items-center bg-stone-50 rounded-xl p-3">
+                      <select
+                        value={ing.productId}
+                        onChange={(e) => updateIngredient(index, 'productId', e.target.value)}
+                        className="flex-1 px-3 py-2 rounded-lg border border-stone-200 text-sm"
+                      >
+                        <option value="">Выберите товар</option>
+                        {PRODUCTS.map(p => (
+                          <option key={p.id} value={p.id}>
+                            {p.name} — {p.price.toLocaleString()} ₽/{p.unit}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="number"
+                        value={ing.quantity || ''}
+                        onChange={(e) => updateIngredient(index, 'quantity', Number(e.target.value))}
+                        placeholder="Кол-во"
+                        className="w-24 px-3 py-2 rounded-lg border border-stone-200 text-sm"
+                        min="0"
+                        step="0.1"
+                      />
+                      {product && (
+                        <span className="text-sm font-medium text-stone-700 w-24 text-right">
+                          {(product.price * ing.quantity).toLocaleString()} ₽
+                        </span>
+                      )}
+                      <button
+                        onClick={() => removeIngredient(index)}
+                        className="p-2 text-stone-400 hover:text-rose-600 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {calculatorRecipe.ingredients.length > 0 && (
+            <div className="bg-gradient-to-r from-rose-50 to-stone-50 rounded-xl p-6 border border-rose-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-stone-600 mb-1">Себестоимость</p>
+                  <p className="text-3xl font-bold text-rose-600">
+                    {calculateRecipeCost().toLocaleString()} ₽
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-stone-600 mb-1">Ингредиентов</p>
+                  <p className="text-2xl font-bold text-stone-800">
+                    {calculatorRecipe.ingredients.length}
+                  </p>
+                </div>
+              </div>
+              {calculatorRecipe.name && (
+                <p className="text-sm text-stone-600 mt-3">
+                  Рецепт: <span className="font-medium">{calculatorRecipe.name}</span>
+                </p>
+              )}
+            </div>
+          )}
         </div>
       )}
 
