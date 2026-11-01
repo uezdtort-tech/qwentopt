@@ -39,6 +39,10 @@ export function Header() {
           <Link to="/constructor" className={`text-sm font-medium ${location.pathname === '/constructor' ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>Конструктор</Link>
           <Link to="/ai-assistant" className={`text-sm font-medium ${location.pathname === '/ai-assistant' ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>AI-помощник</Link>
           <Link to="/visual-constructor" className={`text-sm font-medium ${location.pathname === '/visual-constructor' ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>Визуальный конструктор</Link>
+          <Link to="/ai-cake-generator" className={`text-sm font-medium ${location.pathname === '/ai-cake-generator' ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>AI-генератор</Link>
+          <Link to="/event-planner-pro" className={`text-sm font-medium ${location.pathname === '/event-planner-pro' ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>Event Planner Pro</Link>
+          <Link to="/b2b-marketplace" className={`text-sm font-medium ${location.pathname === '/b2b-marketplace' ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>B2B Маркетплейс</Link>
+          <Link to="/visual-constructor-v2" className={`text-sm font-medium ${location.pathname === '/visual-constructor-v2' ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>Конструктор V2</Link>
           <Link to="/events" className={`text-sm font-medium ${location.pathname === '/events' ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>Мероприятия</Link>
           <Link to="/b2b" className={`text-sm font-medium ${location.pathname === '/b2b' ? 'text-rose-600' : 'text-stone-600 hover:text-rose-600'}`}>Партнёрам</Link>
           {currentUser && (
