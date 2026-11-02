@@ -27,7 +27,7 @@
  * Сложность: P1, 5-7 дней
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Filter, Star, MapPin, Truck, Package, TrendingUp, Plus, Eye, MessageCircle, GitCompare, Calculator, X, Check } from 'lucide-react';
 
 interface Supplier {
@@ -66,6 +66,27 @@ interface Tender {
   deadline: string;
   status: 'open' | 'in_progress' | 'completed';
   offersCount: number;
+}
+
+interface ContactRequest {
+  id: string;
+  supplierId: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  status: 'pending' | 'sent' | 'error';
+  createdAt: string;
+}
+
+interface PurchaseRequest {
+  id: string;
+  productId: string;
+  quantity: number;
+  supplierId: string;
+  status: 'draft' | 'sent' | 'confirmed';
+  createdAt: string;
+  totalPrice: number;
 }
 
 const SUPPLIERS: Supplier[] = [
@@ -204,6 +225,40 @@ export function B2BMarketplacePage() {
     name: string;
     ingredients: { productId: string; quantity: number }[];
   }>({ name: '', ingredients: [] });
+  
+  // Новые состояния для DEMO функциональности
+  const [contactRequests, setContactRequests] = useState<ContactRequest[]>(() => {
+    try {
+      const saved = localStorage.getItem('b2b-contact-requests');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  
+  const [purchaseRequests, setPurchaseRequests] = useState<PurchaseRequest[]>(() => {
+    try {
+      const saved = localStorage.getItem('b2b-purchase-requests');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [showPurchaseForm, setShowPurchaseForm] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: '',
+  });
+  const [purchaseForm, setPurchaseForm] = useState({
+    quantity: 0,
+  });
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
   const categories = ['all', 'Молочные продукты', 'Мука и крупы', 'Шоколад и какао', 'Фрукты и ягоды'];
 
@@ -263,8 +318,144 @@ export function B2BMarketplacePage() {
     });
   };
 
+  // Сохранение в localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('b2b-contact-requests', JSON.stringify(contactRequests));
+    } catch (error) {
+      console.error('Failed to save contact requests:', error);
+    }
+  }, [contactRequests]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('b2b-purchase-requests', JSON.stringify(purchaseRequests));
+    } catch (error) {
+      console.error('Failed to save purchase requests:', error);
+    }
+  }, [purchaseRequests]);
+
+  // Валидация контактной формы
+  const validateContactForm = () => {
+    const errors: Record<string, string> = {};
+    
+    if (!contactForm.name.trim()) {
+      errors.name = 'Имя обязательно';
+    } else if (contactForm.name.trim().length < 2) {
+      errors.name = 'Имя должно содержать минимум 2 символа';
+    }
+    
+    if (!contactForm.email.trim()) {
+      errors.email = 'Email обязателен';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactForm.email)) {
+      errors.email = 'Некорректный формат email';
+    }
+    
+    if (!contactForm.phone.trim()) {
+      errors.phone = 'Телефон обязателен';
+    } else if (!/^\+?[\d\s\-\(\)]{10,}$/.test(contactForm.phone)) {
+      errors.phone = 'Некорректный формат телефона';
+    }
+    
+    if (!contactForm.message.trim()) {
+      errors.message = 'Сообщение обязательно';
+    } else if (contactForm.message.trim().length < 10) {
+      errors.message = 'Сообщение должно содержать минимум 10 символов';
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Валидация формы закупки
+  const validatePurchaseForm = (product: Product) => {
+    const errors: Record<string, string> = {};
+    
+    if (purchaseForm.quantity <= 0) {
+      errors.quantity = 'Количество должно быть больше 0';
+    } else if (purchaseForm.quantity < product.minQuantity) {
+      errors.quantity = `Минимальное количество: ${product.minQuantity} ${product.unit}`;
+    } else if (!Number.isInteger(purchaseForm.quantity)) {
+      errors.quantity = 'Количество должно быть целым числом';
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Отправка контактного запроса
+  const handleContactSubmit = async (supplierId: string) => {
+    if (!validateContactForm()) return;
+    
+    setSubmitStatus('submitting');
+    
+    // Имитация отправки
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const newRequest: ContactRequest = {
+      id: `cr-${Date.now()}`,
+      supplierId,
+      name: contactForm.name.trim(),
+      email: contactForm.email.trim(),
+      phone: contactForm.phone.trim(),
+      message: contactForm.message.trim(),
+      status: 'sent',
+      createdAt: new Date().toISOString(),
+    };
+    
+    setContactRequests(prev => [...prev, newRequest]);
+    setSubmitStatus('success');
+    
+    // Сброс формы
+    setTimeout(() => {
+      setContactForm({ name: '', email: '', phone: '', message: '' });
+      setShowContactForm(false);
+      setSubmitStatus('idle');
+    }, 2000);
+  };
+
+  // Отправка запроса на закупку
+  const handlePurchaseSubmit = async (product: Product) => {
+    if (!validatePurchaseForm(product)) return;
+    
+    setSubmitStatus('submitting');
+    
+    // Имитация отправки
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const newRequest: PurchaseRequest = {
+      id: `pr-${Date.now()}`,
+      productId: product.id,
+      quantity: purchaseForm.quantity,
+      supplierId: product.supplierId,
+      status: 'sent',
+      createdAt: new Date().toISOString(),
+      totalPrice: product.price * purchaseForm.quantity,
+    };
+    
+    setPurchaseRequests(prev => [...prev, newRequest]);
+    setSubmitStatus('success');
+    
+    // Сброс формы
+    setTimeout(() => {
+      setPurchaseForm({ quantity: 0 });
+      setShowPurchaseForm(false);
+      setSelectedProduct(null);
+      setSubmitStatus('idle');
+    }, 2000);
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* DEMO индикатор */}
+      <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-2">
+        <span className="text-amber-600 font-bold text-sm">DEMO:</span>
+        <p className="text-sm text-amber-800">
+          Это демонстрационная версия B2B Marketplace. Данные являются примерами и не представляют реальных поставщиков или товары. 
+          Запросы сохраняются локально в браузере и не отправляются реальным поставщикам.
+        </p>
+      </div>
+
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-stone-800 flex items-center gap-2">
           <Package className="w-8 h-8 text-rose-600" />
@@ -407,11 +598,24 @@ export function B2BMarketplacePage() {
               </div>
 
               <div className="flex gap-2">
-                <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors text-sm">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedSupplier(supplier);
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors text-sm"
+                >
                   <Eye className="w-4 h-4" />
                   Подробнее
                 </button>
-                <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-stone-100 text-stone-700 rounded-lg hover:bg-stone-200 transition-colors text-sm">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedSupplier(supplier);
+                    setShowContactForm(true);
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-stone-100 text-stone-700 rounded-lg hover:bg-stone-200 transition-colors text-sm"
+                >
                   <MessageCircle className="w-4 h-4" />
                   Связаться
                 </button>
@@ -479,9 +683,17 @@ export function B2BMarketplacePage() {
                       </>
                     )}
                   </button>
-                  <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors">
+                  <button 
+                    onClick={() => {
+                      setSelectedProduct(product);
+                      setShowPurchaseForm(true);
+                      setPurchaseForm({ quantity: product.minQuantity });
+                    }}
+                    disabled={!product.inStock}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors disabled:bg-stone-300 disabled:cursor-not-allowed"
+                  >
                     <Plus className="w-4 h-4" />
-                    Заказать
+                    {product.inStock ? 'Заказать' : 'Нет в наличии'}
                   </button>
                 </div>
               </div>
@@ -847,7 +1059,12 @@ export function B2BMarketplacePage() {
               </div>
 
               <div className="flex gap-3">
-                <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-rose-600 text-white rounded-xl hover:bg-rose-700 transition-colors font-medium">
+                <button 
+                  onClick={() => {
+                    setShowContactForm(true);
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-rose-600 text-white rounded-xl hover:bg-rose-700 transition-colors font-medium"
+                >
                   <MessageCircle className="w-5 h-5" />
                   Связаться с поставщиком
                 </button>
@@ -860,6 +1077,305 @@ export function B2BMarketplacePage() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Модальное окно контактного запроса */}
+      {showContactForm && selectedSupplier && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <h2 className="text-xl font-bold text-stone-800">Связаться с поставщиком</h2>
+                  <p className="text-sm text-stone-600 mt-1">{selectedSupplier.name}</p>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowContactForm(false);
+                    setContactForm({ name: '', email: '', phone: '', message: '' });
+                    setFormErrors({});
+                    setSubmitStatus('idle');
+                  }}
+                  className="p-2 hover:bg-stone-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {submitStatus === 'success' ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Check className="w-8 h-8 text-emerald-600" />
+                  </div>
+                  <h3 className="font-semibold text-lg text-stone-800 mb-2">Запрос отправлен!</h3>
+                  <p className="text-sm text-stone-600">Поставщик свяжется с вами в ближайшее время</p>
+                </div>
+              ) : (
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  handleContactSubmit(selectedSupplier.id);
+                }} className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-stone-700 mb-1 block">
+                      Имя <span className="text-rose-600">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={contactForm.name}
+                      onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                      className={`w-full px-3 py-2 rounded-lg border ${formErrors.name ? 'border-rose-500' : 'border-stone-200'} focus:outline-none focus:ring-2 focus:ring-rose-300`}
+                      placeholder="Ваше имя"
+                    />
+                    {formErrors.name && <p className="text-xs text-rose-600 mt-1">{formErrors.name}</p>}
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-stone-700 mb-1 block">
+                      Email <span className="text-rose-600">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      value={contactForm.email}
+                      onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                      className={`w-full px-3 py-2 rounded-lg border ${formErrors.email ? 'border-rose-500' : 'border-stone-200'} focus:outline-none focus:ring-2 focus:ring-rose-300`}
+                      placeholder="your@email.com"
+                    />
+                    {formErrors.email && <p className="text-xs text-rose-600 mt-1">{formErrors.email}</p>}
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-stone-700 mb-1 block">
+                      Телефон <span className="text-rose-600">*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      value={contactForm.phone}
+                      onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value })}
+                      className={`w-full px-3 py-2 rounded-lg border ${formErrors.phone ? 'border-rose-500' : 'border-stone-200'} focus:outline-none focus:ring-2 focus:ring-rose-300`}
+                      placeholder="+7 (900) 123-45-67"
+                    />
+                    {formErrors.phone && <p className="text-xs text-rose-600 mt-1">{formErrors.phone}</p>}
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-stone-700 mb-1 block">
+                      Сообщение <span className="text-rose-600">*</span>
+                    </label>
+                    <textarea
+                      value={contactForm.message}
+                      onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                      rows={4}
+                      className={`w-full px-3 py-2 rounded-lg border ${formErrors.message ? 'border-rose-500' : 'border-stone-200'} focus:outline-none focus:ring-2 focus:ring-rose-300 resize-none`}
+                      placeholder="Опишите ваш запрос..."
+                    />
+                    {formErrors.message && <p className="text-xs text-rose-600 mt-1">{formErrors.message}</p>}
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowContactForm(false);
+                        setContactForm({ name: '', email: '', phone: '', message: '' });
+                        setFormErrors({});
+                      }}
+                      className="flex-1 px-4 py-2 bg-stone-100 text-stone-700 rounded-lg hover:bg-stone-200 transition-colors"
+                    >
+                      Отмена
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submitStatus === 'submitting'}
+                      className="flex-1 px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {submitStatus === 'submitting' ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          Отправка...
+                        </>
+                      ) : (
+                        <>
+                          <MessageCircle className="w-4 h-4" />
+                          Отправить
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модальное окно закупки */}
+      {showPurchaseForm && selectedProduct && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <h2 className="text-xl font-bold text-stone-800">Закупка товара</h2>
+                  <p className="text-sm text-stone-600 mt-1">{selectedProduct.name}</p>
+                  <p className="text-sm text-stone-500">
+                    {selectedProduct.price.toLocaleString()} ₽/{selectedProduct.unit} · Мин. {selectedProduct.minQuantity} {selectedProduct.unit}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowPurchaseForm(false);
+                    setSelectedProduct(null);
+                    setPurchaseForm({ quantity: 0 });
+                    setFormErrors({});
+                    setSubmitStatus('idle');
+                  }}
+                  className="p-2 hover:bg-stone-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {submitStatus === 'success' ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Check className="w-8 h-8 text-emerald-600" />
+                  </div>
+                  <h3 className="font-semibold text-lg text-stone-800 mb-2">Запрос создан!</h3>
+                  <p className="text-sm text-stone-600 mb-2">
+                    Количество: {purchaseForm.quantity} {selectedProduct.unit}
+                  </p>
+                  <p className="text-sm font-semibold text-rose-600">
+                    Итого: {(selectedProduct.price * purchaseForm.quantity).toLocaleString()} ₽
+                  </p>
+                  <p className="text-xs text-stone-500 mt-4">
+                    DEMO: Запрос сохранён локально и не отправлен поставщику
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  handlePurchaseSubmit(selectedProduct);
+                }} className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-stone-700 mb-1 block">
+                      Количество ({selectedProduct.unit}) <span className="text-rose-600">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      value={purchaseForm.quantity || ''}
+                      onChange={(e) => setPurchaseForm({ quantity: Number(e.target.value) })}
+                      min={selectedProduct.minQuantity}
+                      step="1"
+                      className={`w-full px-3 py-2 rounded-lg border ${formErrors.quantity ? 'border-rose-500' : 'border-stone-200'} focus:outline-none focus:ring-2 focus:ring-rose-300`}
+                      placeholder={`Мин. ${selectedProduct.minQuantity}`}
+                    />
+                    {formErrors.quantity && <p className="text-xs text-rose-600 mt-1">{formErrors.quantity}</p>}
+                  </div>
+
+                  {purchaseForm.quantity > 0 && (
+                    <div className="bg-stone-50 rounded-lg p-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-stone-600">Итого:</span>
+                        <span className="text-xl font-bold text-rose-600">
+                          {(selectedProduct.price * purchaseForm.quantity).toLocaleString()} ₽
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowPurchaseForm(false);
+                        setSelectedProduct(null);
+                        setPurchaseForm({ quantity: 0 });
+                        setFormErrors({});
+                      }}
+                      className="flex-1 px-4 py-2 bg-stone-100 text-stone-700 rounded-lg hover:bg-stone-200 transition-colors"
+                    >
+                      Отмена
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submitStatus === 'submitting'}
+                      className="flex-1 px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {submitStatus === 'submitting' ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          Отправка...
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-4 h-4" />
+                          Создать запрос
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Список запросов */}
+      {(contactRequests.length > 0 || purchaseRequests.length > 0) && (
+        <div className="mt-8 bg-white rounded-xl border border-stone-200 p-6">
+          <h2 className="font-semibold text-lg text-stone-800 mb-4">Мои запросы (DEMO)</h2>
+          
+          {contactRequests.length > 0 && (
+            <div className="mb-6">
+              <h3 className="font-medium text-stone-700 mb-3">Контактные запросы</h3>
+              <div className="space-y-2">
+                {contactRequests.map(request => {
+                  const supplier = SUPPLIERS.find(s => s.id === request.supplierId);
+                  return (
+                    <div key={request.id} className="flex items-center justify-between p-3 bg-stone-50 rounded-lg">
+                      <div>
+                        <p className="text-sm font-medium">{supplier?.name}</p>
+                        <p className="text-xs text-stone-500">{new Date(request.createdAt).toLocaleString('ru-RU')}</p>
+                      </div>
+                      <span className="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">
+                        Отправлен
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {purchaseRequests.length > 0 && (
+            <div>
+              <h3 className="font-medium text-stone-700 mb-3">Запросы на закупку</h3>
+              <div className="space-y-2">
+                {purchaseRequests.map(request => {
+                  const product = PRODUCTS.find(p => p.id === request.productId);
+                  const supplier = SUPPLIERS.find(s => s.id === request.supplierId);
+                  return (
+                    <div key={request.id} className="flex items-center justify-between p-3 bg-stone-50 rounded-lg">
+                      <div>
+                        <p className="text-sm font-medium">{product?.name}</p>
+                        <p className="text-xs text-stone-500">
+                          {request.quantity} {product?.unit} · {supplier?.name}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-rose-600">{request.totalPrice.toLocaleString()} ₽</p>
+                        <span className="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">
+                          Отправлен
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
