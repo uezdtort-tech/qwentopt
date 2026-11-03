@@ -82,7 +82,7 @@ const DIETARY = [
 ];
 
 export function AIAssistantPage() {
-  const { store } = useStore();
+  const { store, setStore } = useStore();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [state, setState] = useState<AssistantState>({
@@ -264,13 +264,27 @@ export function AIAssistantPage() {
   };
 
   const handleAddToCart = (product: any) => {
-    // TODO: Интеграция с корзиной
-    alert(`Торт "${product.name}" добавлен в корзину!`);
+    const existing = store.cart.find(c => c.productId === product.id);
+    if (existing) {
+      setStore(s => ({
+        ...s,
+        cart: s.cart.map(c => c.productId === product.id ? { ...c, qty: c.qty + 1 } : c)
+      }));
+    } else {
+      setStore(s => ({
+        ...s,
+        cart: [...s.cart, { productId: product.id, name: product.name, price: product.price, qty: 1, sellerId: product.sellerId }]
+      }));
+    }
   };
 
   const handleAddToFavorites = (product: any) => {
-    // TODO: Интеграция с избранным
-    alert(`Торт "${product.name}" добавлен в избранное!`);
+    if (!store.favorites.includes(product.id)) {
+      setStore(s => ({
+        ...s,
+        favorites: [...s.favorites, product.id]
+      }));
+    }
   };
 
   const renderOptions = () => {
