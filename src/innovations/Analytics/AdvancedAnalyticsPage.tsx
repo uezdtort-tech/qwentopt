@@ -28,33 +28,55 @@ export function AdvancedAnalyticsPage() {
   const { store } = useStore();
   const [period, setPeriod] = useState<'week' | 'month' | 'year'>('month');
 
-  // Генерация тестовых данных для графиков
-  const generateSalesData = () => {
+  // Реальные данные из заказов
+  const salesData = useMemo(() => {
     const days = period === 'week' ? 7 : period === 'month' ? 30 : 365;
-    return Array.from({ length: days }, (_, i) => ({
-      date: new Date(Date.now() - (days - i) * 24 * 60 * 60 * 1000).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }),
-      sales: Math.floor(Math.random() * 5000) + 2000,
-      orders: Math.floor(Math.random() * 10) + 2,
-    }));
-  };
-
-  const salesData = useMemo(() => generateSalesData(), [period]);
+    const now = Date.now();
+    const data = [];
+    
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(now - i * 24 * 60 * 60 * 1000);
+      const dateStr = date.toISOString().split('T')[0];
+      
+      const dayOrders = store.orders.filter(o => o.createdAt === dateStr);
+      const sales = dayOrders.reduce((sum, o) => sum + o.total, 0);
+      const orders = dayOrders.length;
+      
+      data.push({
+        date: date.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }),
+        sales,
+        orders,
+      });
+    }
+    
+    return data;
+  }, [period, store.orders]);
 
   const totalSales = salesData.reduce((sum, d) => sum + d.sales, 0);
   const totalOrders = salesData.reduce((sum, d) => sum + d.orders, 0);
   const avgOrderValue = totalOrders > 0 ? totalSales / totalOrders : 0;
 
-  // Топ товаров
+  // Топ товаров на основе реальных заказов
   const topProducts = useMemo(() => {
+    const productSales = new Map<string, { sales: number; revenue: number }>();
+    
+    store.orders.forEach(order => {
+      const current = productSales.get(order.productId) || { sales: 0, revenue: 0 };
+      productSales.set(order.productId, {
+        sales: current.sales + 1,
+        revenue: current.revenue + order.total,
+      });
+    });
+    
     return store.products
       .map(p => ({
         ...p,
-        sales: Math.floor(Math.random() * 50) + 10,
-        revenue: Math.floor(Math.random() * 100000) + 20000,
+        sales: productSales.get(p.id)?.sales || 0,
+        revenue: productSales.get(p.id)?.revenue || 0,
       }))
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
-  }, [store.products]);
+  }, [store.products, store.orders]);
 
   // Статус заказов
   const orderStats = useMemo(() => {

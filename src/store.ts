@@ -13,6 +13,7 @@ export interface Store {
   events: Event[];
   cakeProjects: CakeProject[];
   cart: CartItem[];
+  favorites: string[]; // IDs избранных товаров
   currentUserId: string | null;
 }
 
@@ -34,6 +35,7 @@ export function loadStore(): Store {
     events: initialEvents,
     cakeProjects: [],
     cart: [],
+    favorites: [],
     currentUserId: null,
   };
 }
